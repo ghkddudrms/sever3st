@@ -279,6 +279,10 @@ async def my_background_task():
 			if channel != '':			
 				#await client.get_channel(channel).send('now : ' + nowDateString + '   ' + nowTimeString + '  end : ' + endDateString + '   ' + endTimeString, tts=False)
 				if endTimeString == nowTimeString and endDateString == nowDateString:
+					for i in range(bossNum):
+						if bossMungFlag[i] == True:
+							bossTimeString[i] = tmp_bossTime[i].strftime('%H:%M:%S')
+							bossDateString[i] = tmp_bossTime[i].strftime('%Y-%m-%d')
 					await dbSave()
 					await client.get_channel(channel).send('<갑자기 인사해도 놀라지마세요!>', tts=False)
 					await asyncio.sleep(2)
@@ -651,6 +655,33 @@ async def on_message(msg):
 		chflg = 1
 		
 	if client.get_channel(channel) != msg.channel :
+		##### 사다리 채널바꾸기
+		'''
+		if msg.channel.id == int('552122574855864321'): #### 사다리 채널ID 값넣으면 됨
+			message = await msg.channel.fetch_message(msg.id)
+			##################################
+
+			if message.content.startswith('!사다리'):
+				ladder = []
+				ladder = message.content[5:].split(" ")
+				num_cong = int(ladder[0])
+				del(ladder[0])
+				if num_cong < len(ladder):
+					result_ladder = random.sample(ladder, num_cong)
+					result_ladderSTR = ','.join(map(str, result_ladder))
+					embed = discord.Embed(
+						title = "----- 당첨! -----",
+						description= '```' + result_ladderSTR + '```',
+						color=0xff00ff
+						)
+					await msg.channel.send(embed=embed, tts=False)
+				else:
+					await msg.channel.send('```추첨인원이 총 인원과 같거나 많습니다. 재입력 해주세요```', tts=False)
+
+			##################################
+		else :
+			return None
+		'''
 		return None
 	else :
 		message = await client.get_channel(channel).fetch_message(msg.id)
@@ -920,6 +951,8 @@ async def on_message(msg):
 			else:
 				await client.get_channel(channel).send('```추첨인원이 총 인원과 같거나 많습니다. 재입력 해주세요```', tts=False)
 			
+		##################################
+		
 		if message.content.startswith('!메뉴'):
 			embed = discord.Embed(
 					title = "----- 메뉴 -----",
@@ -966,6 +999,10 @@ async def on_message(msg):
 		##################################
 
 		if message.content.startswith('!명치'):
+			for i in range(bossNum):
+				if bossMungFlag[i] == True:
+					bossTimeString[i] = tmp_bossTime[i].strftime('%H:%M:%S')
+					bossDateString[i] = tmp_bossTime[i].strftime('%Y-%m-%d')
 			await dbSave()
 			await client.get_channel(channel).send('<명치 맞고 숨고르는 중... 갑자기 인사해도 놀라지마세요!>', tts=False)
 			await asyncio.sleep(2)
